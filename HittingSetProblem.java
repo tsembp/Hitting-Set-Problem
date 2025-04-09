@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 public class HittingSetProblem {
 
-
     /**
      * 1st VARIANT
      * - Divide & Conquer Approach
@@ -139,13 +138,28 @@ public class HittingSetProblem {
         }
     
         // Sort elements of pickedSet based on their criticallity
-        int[] sorted = new int[pickedSet.length];
-        System.arraycopy(pickedSet, 0, sorted, 0, pickedSet.length); // copy whole pickedSet into sorted array
-        Arrays.sort(sorted); // sort array
+        int[] sortedPickedSet = new int[pickedSet.length];
+        System.arraycopy(pickedSet, 0, sortedPickedSet, 0, pickedSet.length); // copy whole pickedSet into sortedPickedSet array
+
+        for (int i = 0; i < sortedPickedSet.length - 1; i++) {
+            for (int j = i + 1; j < sortedPickedSet.length; j++) {
+                int a = sortedPickedSet[i];
+                int b = sortedPickedSet[j];
+                if (a == 0 || b == 0) continue;
+    
+                if (criticallityAray[b] > criticallityAray[a] || 
+                   (criticallityAray[b] == criticallityAray[a] && b < a)) {
+                    // swap
+                    int temp = sortedPickedSet[i];
+                    sortedPickedSet[i] = sortedPickedSet[j];
+                    sortedPickedSet[j] = temp;
+                }
+            }
+        }
     
         // Recursive call on each element based on criticallity (most critical first)
-        for (int i = 0; i < sorted.length; i++) {
-            int element = sorted[i];
+        for (int i = 0; i < sortedPickedSet.length; i++) {
+            int element = sortedPickedSet[i];
             if (element == 0) continue;
     
             int[][] reduced = reduceSets(currentSets, element);
