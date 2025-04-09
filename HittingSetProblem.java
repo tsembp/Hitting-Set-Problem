@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class HittingSetProblem {
 
@@ -116,6 +117,48 @@ public class HittingSetProblem {
      *   most critical element.
      */
     public int[] algorithm4(int[][] currentSets, int n, int c, int k){
+        if(currentSets.length == 0) return new int[0];
+        if(k == 0) return null;
+    
+        // Find set with least number of elements
+        int setIndex = findSetWithLeastElements(currentSets, c);
+        int[] pickedSet = currentSets[setIndex];
+    
+        // Calculate criticallity of each element [1..n]
+        int[] criticallityAray = new int[n + 1];
+        for (int i = 0; i < currentSets.length; i++) {
+            boolean[] seen = new boolean[n + 1];
+            for (int j = 0; j < currentSets[i].length; j++) {
+                int el = currentSets[i][j];
+                if (el == 0) continue;
+                if (!seen[el]) {
+                    criticallityAray[el]++;
+                    seen[el] = true;
+                }
+            }
+        }
+    
+        // Sort elements of pickedSet based on their criticallity
+        int[] sorted = new int[pickedSet.length];
+        System.arraycopy(pickedSet, 0, sorted, 0, pickedSet.length); // copy whole pickedSet into sorted array
+        Arrays.sort(sorted); // sort array
+    
+        // Recursive call on each element based on criticallity (most critical first)
+        for (int i = 0; i < sorted.length; i++) {
+            int element = sorted[i];
+            if (element == 0) continue;
+    
+            int[][] reduced = reduceSets(currentSets, element);
+            int[] solution = algorithm4(reduced, n, c, k - 1);
+    
+            if (solution != null) {
+                int[] hittingSet = new int[solution.length + 1];
+                hittingSet[0] = element;
+                System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+                return hittingSet;
+            }
+        }
+    
         return null;
     }
 
@@ -227,6 +270,12 @@ public class HittingSetProblem {
         return minIndex;
     }
 
+    /**
+     * Helper method that reads contents of sets.dat and returns data read
+     * @param filename
+     * @return Data read for sets
+     * @throws IOException
+     */
     private Object[] loadData(String filename) throws IOException{
         BufferedReader reader = new BufferedReader(new FileReader(filename));
         String[] line1 = reader.readLine().trim().split("\\s+");
@@ -242,17 +291,6 @@ public class HittingSetProblem {
                 sets[i][j] = Integer.parseInt(line[j]);
             }
             // if B set's length is < than c, it automatically gets filled with 0s
-        }
-
-        System.out.println("[DATA] Loaded Data:");
-        System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
-
-        for(int i = 0; i < m; i++){
-            System.out.print("B[" + i + "] = {");
-            for(int j = 0; j < c; j++){
-                System.out.print(sets[i][j] + ", ");
-            }
-            System.out.println("}");
         }
 
         reader.close();
@@ -271,6 +309,16 @@ public class HittingSetProblem {
             int k = (int)data[3];
             int[][] sets = (int[][])data[4];
 
+            System.out.println("[DATA] Loaded Data:");
+            System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
+    
+            for(int i = 0; i < m; i++){
+                System.out.print("B[" + i + "] = {");
+                for(int j = 0; j < c; j++){
+                    System.out.print(sets[i][j] + ", ");
+                }
+                System.out.println("}");
+            }
 
             // Test Algorithm 1
             long start = System.nanoTime();
@@ -310,6 +358,21 @@ public class HittingSetProblem {
             System.out.println("\nAlgorithm 3 result:");
             if (result3 != null) {
                 for (int val : result3) {
+                    System.out.print(val + " ");
+                }
+            } else {
+                System.out.println("No hitting set of size ≤ k found.");
+            }
+            System.out.println("\nTime: " + (end - start)/1_000_000 + " ms");
+
+            // Test Algorithm 4
+            start = System.nanoTime();
+            int[] result4 = hsp.algorithm4(sets, n, c, k);
+            end = System.nanoTime();
+    
+            System.out.println("\nAlgorithm 4 result:");
+            if (result4 != null) {
+                for (int val : result4) {
                     System.out.print(val + " ");
                 }
             } else {
