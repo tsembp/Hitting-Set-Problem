@@ -20,19 +20,22 @@ public class HittingSetProblem {
         // For each element of pickedSet, attempt to find result by removing it
         for(int i = 0; i < pickedSet.length; i++){
             int element = pickedSet[i];
-            if(element == 0) continue;
+            if(element == 0) continue; // skip 0 (indicates that set's length < c)
 
-            // Get sets that remain after removing those that contain element
+            // Reduce problem by removing sets that contain element
             int[][] reducedProblem = reduceSets(currentSets, element);
             
-            // Recursive call on reduced problem (without element)
+            // Recursive call on reduced problem
             int[] solution = algorithm1(reducedProblem, n, c, k - 1);
             
             if(solution != null){ // if solution is found
+                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
+
                 // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
                 System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+
                 return hittingSet;
             }
         }
@@ -51,20 +54,23 @@ public class HittingSetProblem {
         if(currentSets.length == 0) return new int[0];
         if(k == 0) return null;
 
-        // Reduce problem by the critical element
+        // Find critical element of all sets
         int criticalElement = findCriticalElement(currentSets, n);
         
-        // Get sets that remain after removing those that contain the critical element
+        // Reduce problem by removing sets that contain the critical element
         int[][] reducedProblem = reduceSets(currentSets, criticalElement);
 
-        // Recursive call on reduced problem (without element)
+        // Recursive call on reduced problem
         int[] solution = algorithm2(reducedProblem, n, c, k - 1);
 
         if(solution != null){ // if solution is found
+            // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
             int[] hittingSet = new int[solution.length + 1];
             hittingSet[0] = criticalElement;
+
             // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
             System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+
             return hittingSet;
         }
 
@@ -91,17 +97,20 @@ public class HittingSetProblem {
             int element = pickedSet[i];
             if(element == 0) continue;
 
-            // Get sets that remain after removing those that contain element
+            // Reduce problem by removing sets that contain element
             int[][] reducedProblem = reduceSets(currentSets, element);
             
-            // Recursive call on reduced problem (without element)
+            // Recursive call on reduced problem
             int[] solution = algorithm3(reducedProblem, n, c, k - 1);
             
             if(solution != null){ // if solution is found
+                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
+
                 // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
                 System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+
                 return hittingSet;
             }
         }
@@ -141,6 +150,7 @@ public class HittingSetProblem {
         int[] sortedPickedSet = new int[pickedSet.length];
         System.arraycopy(pickedSet, 0, sortedPickedSet, 0, pickedSet.length); // copy whole pickedSet into sortedPickedSet array
 
+        // Bubble sort - sort in descending order based on criticallity value
         for (int i = 0; i < sortedPickedSet.length - 1; i++) {
             for (int j = i + 1; j < sortedPickedSet.length; j++) {
                 int a = sortedPickedSet[i];
@@ -156,19 +166,44 @@ public class HittingSetProblem {
                 }
             }
         }
+
+        // // Alternatively (of bubble sort) use arrow function with Java's built in sort:
+        // Integer[] indices = new Integer[pickedSet.length];
+        // for (int i = 0; i < indices.length; i++) {
+        //     indices[i] = i;
+        // }
+
+        // Arrays.sort(indices, (i, j) -> {
+        //     int a = pickedSet[i];
+        //     int b = pickedSet[j];
+            
+        //     if (a == 0) return 1; // Move zeros to the end
+        //     if (b == 0) return -1;
+            
+        //     if (criticallityAray[b] != criticallityAray[a])
+        //         return criticallityAray[b] - criticallityAray[a]; // Descending by criticality
+        //     return a - b; // Ascending by element value for ties
+        // });
     
         // Recursive call on each element based on criticallity (most critical first)
         for (int i = 0; i < sortedPickedSet.length; i++) {
             int element = sortedPickedSet[i];
             if (element == 0) continue;
-    
+            
+            // Reduce problem by removing sets that contain element
             int[][] reduced = reduceSets(currentSets, element);
+
+            // Recursive call on reduced problem
             int[] solution = algorithm4(reduced, n, c, k - 1);
     
-            if (solution != null) {
+            if (solution != null) { // if solution is found
+                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
+
+                // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
                 System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+
                 return hittingSet;
             }
         }
@@ -182,9 +217,9 @@ public class HittingSetProblem {
     /**
      * Helper funtion  that removes all sets that contain `element`
      * 
-     * @param currentSets   // sets that we have now
-     * @param element       // element to indicate which sets to be removes
-     * @return              // new sets with those that contain `element` removed
+     * @param currentSets   sets that we have now
+     * @param element       element to indicate which sets to be removes
+     * @return              new sets with those that contain `element` removed
      */
     private int[][] reduceSets(int[][] currentSets, int element) {
         // Count how many sets DON'T contain element
@@ -199,9 +234,8 @@ public class HittingSetProblem {
             }
             if(!found) count++;
         }
-
-        // Create new array to represent sets, having removed sets that contain element
-        int[][] reduced = new int[count][currentSets[0].length];
+        
+        int[][] reduced = new int[count][currentSets[0].length]; // new array to represent sets, having removed sets that contain element
         int setIndex = 0; // index to keep track of sets that dont contain element
         for(int i = 0; i < currentSets.length; i++){
             boolean found = false;
@@ -215,9 +249,7 @@ public class HittingSetProblem {
             // If we didn't encounter element in the set Bi
             if(!found){
                 // Copy all elements of set Bi into reduced
-                for(int j = 0; j < currentSets[i].length; j++){
-                    reduced[setIndex][j] = currentSets[i][j];
-                }
+                System.arraycopy(currentSets[i], 0, reduced[setIndex], 0, currentSets[i].length);
                 setIndex++;
             }
         }
@@ -228,8 +260,8 @@ public class HittingSetProblem {
     /**
      * Helper method that returns the critical element
      * Critical Element: Element that appears in mosts subsets B
-     * @param currentSets
-     * @return Critical Element
+     * @param currentSets   sets that we have now
+     * @return              critical element
      */
     private int findCriticalElement(int[][] currentSets, int n) {
         int[] occurances = new int[n + 1]; // occurances[i]: number of sets that contain element i
@@ -275,7 +307,8 @@ public class HittingSetProblem {
                     count++;
                 }
             }
-            if(count > minCount){
+
+            if(count < minCount){
                 minCount = count;
                 minIndex = i;
             }
