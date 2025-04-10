@@ -53,25 +53,60 @@ public class HittingSetProblem {
     public int[] algorithm2(int[][] currentSets, int n, int c, int k){
         if(currentSets.length == 0) return new int[0];
         if(k == 0) return null;
-
-        // Find critical element of all sets
-        int criticalElement = findCriticalElement(currentSets, n);
         
-        // Reduce problem by removing sets that contain the critical element
-        int[][] reducedProblem = reduceSets(currentSets, criticalElement);
+        // Select random set
+        int randomIndex = (int)(Math.random() * currentSets.length);
+        int[] pickedSet = currentSets[randomIndex];
 
-        // Recursive call on reduced problem
-        int[] solution = algorithm2(reducedProblem, n, c, k - 1);
+        // Get criticallity value for each element of pickedSet
+        int[] criticallityArray = getCriticallities(currentSets, pickedSet);
 
-        if(solution != null){ // if solution is found
-            // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
-            int[] hittingSet = new int[solution.length + 1];
-            hittingSet[0] = criticalElement;
+        // Sort pickedSet based on criticallity of each element (descending order)
+        for (int i = 0; i < pickedSet.length - 1; i++) {
+            for (int j = i + 1; j < pickedSet.length; j++) {
+                int a = pickedSet[i];
+                int b = pickedSet[j];
 
-            // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
-            System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+                if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
 
-            return hittingSet;
+                int critA = criticallityArray[i];
+                int critB = criticallityArray[j];
+
+                if (critB > critA || (critB == critA && b < a)) {
+                    // swap elements in pickedSet
+                    int temp = pickedSet[i];
+                    pickedSet[i] = pickedSet[j];
+                    pickedSet[j] = temp;
+
+                    // swap parallel criticallity values
+                    int tmpCrit = criticallityArray[i];
+                    criticallityArray[i] = criticallityArray[j];
+                    criticallityArray[j] = tmpCrit;
+                }
+            }
+        }
+
+        // For each element of pickedSet, attempt to find result by removing it
+        for(int i = 0; i < pickedSet.length; i++){
+            int element = pickedSet[i];
+            if(element == 0) continue; // skip 0 (indicates that set's length < c)
+
+            // Reduce problem by removing sets that contain element
+            int[][] reducedProblem = reduceSets(currentSets, element);
+            
+            // Recursive call on reduced problem
+            int[] solution = algorithm1(reducedProblem, n, c, k - 1);
+            
+            if(solution != null){ // if solution is found
+                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
+                int[] hittingSet = new int[solution.length + 1];
+                hittingSet[0] = element;
+
+                // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
+                System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+
+                return hittingSet;
+            }
         }
 
         return null;
@@ -122,7 +157,7 @@ public class HittingSetProblem {
      * 4th VARIANT
      * - Similar to 1st variant
      * - Select subset with least number of elements and the process of finding a hitting set begins with the
-     *   most critical element.
+     *   most critical element first.
      */
     public int[] algorithm4(int[][] currentSets, int n, int c, int k){
         if(currentSets.length == 0) return new int[0];
@@ -131,72 +166,47 @@ public class HittingSetProblem {
         // Find set with least number of elements
         int setIndex = findSetWithLeastElements(currentSets, c);
         int[] pickedSet = currentSets[setIndex];
-    
-        // Calculate criticallity of each element [1..n]
-        int[] criticallityAray = new int[n + 1];
-        for (int i = 0; i < currentSets.length; i++) {
-            boolean[] seen = new boolean[n + 1];
-            for (int j = 0; j < currentSets[i].length; j++) {
-                int el = currentSets[i][j];
-                if (el == 0) continue;
-                if (!seen[el]) {
-                    criticallityAray[el]++;
-                    seen[el] = true;
-                }
-            }
-        }
-    
-        // Sort elements of pickedSet based on their criticallity
-        int[] sortedPickedSet = new int[pickedSet.length];
-        System.arraycopy(pickedSet, 0, sortedPickedSet, 0, pickedSet.length); // copy whole pickedSet into sortedPickedSet array
 
-        // Bubble sort - sort in descending order based on criticallity value
-        for (int i = 0; i < sortedPickedSet.length - 1; i++) {
-            for (int j = i + 1; j < sortedPickedSet.length; j++) {
-                int a = sortedPickedSet[i];
-                int b = sortedPickedSet[j];
-                if (a == 0 || b == 0) continue;
-    
-                if (criticallityAray[b] > criticallityAray[a] || 
-                   (criticallityAray[b] == criticallityAray[a] && b < a)) {
-                    // swap
-                    int temp = sortedPickedSet[i];
-                    sortedPickedSet[i] = sortedPickedSet[j];
-                    sortedPickedSet[j] = temp;
+        // Get criticallity value for each element of pickedSet
+        int[] criticallityArray = getCriticallities(currentSets, pickedSet);
+
+        // Sort pickedSet based on criticallity of each element (descending order)
+        for (int i = 0; i < pickedSet.length - 1; i++) {
+            for (int j = i + 1; j < pickedSet.length; j++) {
+                int a = pickedSet[i];
+                int b = pickedSet[j];
+
+                if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
+
+                int critA = criticallityArray[i];
+                int critB = criticallityArray[j];
+
+                if (critB > critA || (critB == critA && b < a)) {
+                    // swap elements in pickedSet
+                    int temp = pickedSet[i];
+                    pickedSet[i] = pickedSet[j];
+                    pickedSet[j] = temp;
+
+                    // swap parallel criticallity values
+                    int tmpCrit = criticallityArray[i];
+                    criticallityArray[i] = criticallityArray[j];
+                    criticallityArray[j] = tmpCrit;
                 }
             }
         }
 
-        // // Alternatively (of bubble sort) use arrow function with Java's built in sort:
-        // Integer[] indices = new Integer[pickedSet.length];
-        // for (int i = 0; i < indices.length; i++) {
-        //     indices[i] = i;
-        // }
+        // For each element of pickedSet, attempt to find result by removing it
+        for(int i = 0; i < pickedSet.length; i++){
+            int element = pickedSet[i];
+            if(element == 0) continue; // skip 0 (indicates that set's length < c)
 
-        // Arrays.sort(indices, (i, j) -> {
-        //     int a = pickedSet[i];
-        //     int b = pickedSet[j];
-            
-        //     if (a == 0) return 1; // Move zeros to the end
-        //     if (b == 0) return -1;
-            
-        //     if (criticallityAray[b] != criticallityAray[a])
-        //         return criticallityAray[b] - criticallityAray[a]; // Descending by criticality
-        //     return a - b; // Ascending by element value for ties
-        // });
-    
-        // Recursive call on each element based on criticallity (most critical first)
-        for (int i = 0; i < sortedPickedSet.length; i++) {
-            int element = sortedPickedSet[i];
-            if (element == 0) continue;
-            
             // Reduce problem by removing sets that contain element
-            int[][] reduced = reduceSets(currentSets, element);
-
+            int[][] reducedProblem = reduceSets(currentSets, element);
+            
             // Recursive call on reduced problem
-            int[] solution = algorithm4(reduced, n, c, k - 1);
-    
-            if (solution != null) { // if solution is found
+            int[] solution = algorithm1(reducedProblem, n, c, k - 1);
+            
+            if(solution != null){ // if solution is found
                 // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
@@ -207,20 +217,14 @@ public class HittingSetProblem {
                 return hittingSet;
             }
         }
-    
+
         return null;
     }
 
 
     /* HELPER METHODS BELOW */
 
-    /**
-     * Helper funtion  that removes all sets that contain `element`
-     * 
-     * @param currentSets   sets that we have now
-     * @param element       element to indicate which sets to be removes
-     * @return              new sets with those that contain `element` removed
-     */
+    // Helper method to reduce problem
     private int[][] reduceSets(int[][] currentSets, int element) {
         // Count how many sets DON'T contain element
         int count = 0;
@@ -257,45 +261,32 @@ public class HittingSetProblem {
         return reduced;
     }
 
-    /**
-     * Helper method that returns the critical element
-     * Critical Element: Element that appears in mosts subsets B
-     * @param currentSets   sets that we have now
-     * @return              critical element
-     */
-    private int findCriticalElement(int[][] currentSets, int n) {
-        int[] occurances = new int[n + 1]; // occurances[i]: number of sets that contain element i
-    
-        for (int i = 0; i < currentSets.length; i++) {
-            boolean[] seenInThisSet = new boolean[n + 1];
-            for (int j = 0; j < currentSets[i].length; j++) {
-                int element = currentSets[i][j];
-                if (element == 0) continue;
-                if (!seenInThisSet[element]) {
-                    occurances[element]++;
-                    seenInThisSet[element] = true;
+    // Helper method to get criticallity values for alle elements of pickedSet
+    private int[] getCriticallities(int[][] currentSets, int[] pickedSet){
+        int[] criticallityArray = new int[pickedSet.length];
+
+        for(int i = 0; i < pickedSet.length; i++){ // for each element of pickedSet
+            int element = pickedSet[i];
+            if(element == 0) continue; // skip 0 (indicates pickedSet.length < c)
+
+            for(int j = 0; j < currentSets.length; j++){ // for each set Bi
+                boolean found = false;
+                for(int p = 0; p < currentSets[j].length; p++){ // for each element of Bi
+                    if(currentSets[j][p] == element){ // if that element is equal to pickedSet's element
+                        found = true;
+                    }
+                }
+
+                if (found) {
+                    criticallityArray[i]++;
                 }
             }
         }
-    
-        // Find element with highest count, breaking ties by smallest index
-        int max = 0;
-        int maxElement = 0;
-        for (int i = 1; i < occurances.length; i++) {
-            if (occurances[i] > max) {
-                max = occurances[i];
-                maxElement = i;
-            }
-        }
-    
-        return maxElement;
+
+        return criticallityArray;
     }
 
-    /**
-     * Helper method that returns the set with least number of elements
-     * @param currentSets
-     * @return set index with least number of elements
-     */
+    // Helper method to find subset B with least number of elements
     private int findSetWithLeastElements(int[][] currentSets, int c){
         int minCount = c;
         int minIndex = 0;
@@ -317,12 +308,67 @@ public class HittingSetProblem {
         return minIndex;
     }
 
-    /**
-     * Helper method that reads contents of sets.dat and returns data read
-     * @param filename
-     * @return Data read for sets
-     * @throws IOException
-     */
+    // Helper method to validate hitting set
+    private boolean isValidHittingSet(int[] hittingSet, int[][] sets) {
+        for (int i = 0; i < sets.length; i++) {
+            boolean covered = false;
+            for (int j = 0; j < sets[i].length; j++) {
+                int val = sets[i][j];
+                if (val == 0) continue;
+
+                // Check if value in Bi subset is in hitting set
+                for (int h = 0; h < hittingSet.length; h++) {
+                    if (val == hittingSet[h]) {
+                        covered = true;
+                        break;
+                    }
+                }
+
+                // If at least one is found -> break and check next Bi subset
+                if (covered) break;
+            }
+
+            // If we check all values inside Bi subset, and none are found in hitting set -> INVALID
+            if (!covered) return false;
+        }
+        return true;
+    }
+
+    // Helper method to generate random B sets based on given parameters
+    private Object[] generateRandomData(int n, int m, int c, int k) {
+        int[][] sets = new int[m][c];
+        
+        // Generate random sets
+        for (int i = 0; i < m; i++) {
+            // For each set, decide how many elements it will have (between 1 and c)
+            int setSize = 1 + (int)(Math.random() * c);
+            
+            // Use a boolean array to track which elements are already in the set
+            boolean[] used = new boolean[n+1];
+            
+            // Fill the set with random elements
+            for (int j = 0; j < setSize; j++) {
+                int element;
+                do {
+                    // Generate elements from 1 to n (not 0)
+                    element = 1 + (int)(Math.random() * n);
+                } while (used[element]); // Ensure no duplicates in the same set
+                
+                sets[i][j] = element;
+                used[element] = true;
+            }
+            
+            // Sort the elements in the set for better readability
+            Arrays.sort(sets[i], 0, setSize);
+        }
+        
+        // Ensure the generated instance has a hitting set of size ≤ k
+        // This is a simplistic approach - real instances might need more sophisticated generation
+        
+        return new Object[]{sets, n, m, c, k};
+    }
+
+    // Helper method that reads the file and returns data read
     private Object[] loadData(String filename) throws IOException{
         BufferedReader reader = new BufferedReader(new FileReader(filename));
         String[] line1 = reader.readLine().trim().split("\\s+");
@@ -344,88 +390,100 @@ public class HittingSetProblem {
         return new Object[]{n, m, c, k, sets};
     }
 
+    
     public static void main(String[] args) {
         try {
-            HittingSetProblem hsp = new HittingSetProblem();
-            
-            // Retrieve data read from file
-            Object[] data = hsp.loadData("sets.dat");
-            int n = (int)data[0];
-            int m = (int)data[1];
-            int c = (int)data[2];
-            int k = (int)data[3];
-            int[][] sets = (int[][])data[4];
+            boolean experimentMode = false;
 
-            System.out.println("[DATA] Loaded Data:");
-            System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
-    
-            for(int i = 0; i < m; i++){
+            HittingSetProblem hsp = new HittingSetProblem();
+
+            int n, m, c, k;
+            int[][] sets;
+
+            if(experimentMode){
+                n = 6;
+                m = 8;
+                c = 3;
+                k = 3;
+                
+                // Generate random test data
+                Object[] data = hsp.generateRandomData(n, m, c, k);
+                sets = (int[][])data[0];
+                
+                System.out.println("[EXPERIMENT MODE] Generated random data:");
+                System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
+            } else{
+                // Regular Mode - read values from file
+                Object[] data = hsp.loadData("sets.dat");
+                n = (int)data[0];
+                m = (int)data[1];
+                c = (int)data[2];
+                k = (int)data[3];
+                sets = (int[][])data[4];
+
+                System.out.println("[CORRECTNESS MODE] Loaded Data:");
+                System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
+            }
+
+            // Print the sets
+            for(int i = 0; i < m; i++) {
                 System.out.print("B[" + i + "] = {");
-                for(int j = 0; j < c; j++){
-                    System.out.print(sets[i][j] + ", ");
+                for(int j = 0; j < sets[i].length; j++) {
+                    if (sets[i][j] != 0) {
+                        System.out.print(sets[i][j] + ", ");
+                    }
                 }
                 System.out.println("}");
             }
+            System.out.println("");
 
-            // Test Algorithm 1
-            long start = System.nanoTime();
-            int[] result1 = hsp.algorithm1(sets, n, c, k);
-            long end = System.nanoTime();
-    
-            System.out.println("\nAlgorithm 1 result:");
-            if (result1 != null) {
-                for (int val : result1) {
-                    System.out.print(val + " ");
-                }
-            } else {
-                System.out.println("No hitting set of size ≤ k found.");
-            }
-            System.out.println("\nTime: " + (end - start)/1_000_000 + " ms");
+            String[] algorithms = {
+                "Algorithm 1",
+                "Algorithm 2",
+                "Algorithm 3",
+                "Algorithm 4"
+            };
             
-            // Test Algorithm 2
-            start = System.nanoTime();
-            int[] result2 = hsp.algorithm2(sets, n, c, k);
-            end = System.nanoTime();
-    
-            System.out.println("\nAlgorithm 2 result:");
-            if (result2 != null) {
-                for (int val : result2) {
-                    System.out.print(val + " ");
-                }
-            } else {
-                System.out.println("No hitting set of size ≤ k found.");
-            }
-            System.out.println("\nTime: " + (end - start)/1_000_000 + " ms");
+            int[][] results = new int[4][];
+            long[] times = new long[4];
             
-            // Test Algorithm 3
-            start = System.nanoTime();
-            int[] result3 = hsp.algorithm3(sets, n, c, k);
-            end = System.nanoTime();
-    
-            System.out.println("\nAlgorithm 3 result:");
-            if (result3 != null) {
-                for (int val : result3) {
-                    System.out.print(val + " ");
+            for (int i = 0; i < 4; i++) {
+                long start = System.nanoTime();
+            
+                switch (i) {
+                    case 0:
+                        results[i] = hsp.algorithm1(sets, n, c, k);
+                        break;
+                    case 1:
+                        results[i] = hsp.algorithm2(sets, n, c, k);
+                        break;
+                    case 2:
+                        results[i] = hsp.algorithm3(sets, n, c, k);
+                        break;
+                    case 3:
+                        results[i] = hsp.algorithm4(sets, n, c, k);
+                        break;
                 }
-            } else {
-                System.out.println("No hitting set of size ≤ k found.");
-            }
-            System.out.println("\nTime: " + (end - start)/1_000_000 + " ms");
-
-            // Test Algorithm 4
-            start = System.nanoTime();
-            int[] result4 = hsp.algorithm4(sets, n, c, k);
-            end = System.nanoTime();
-    
-            System.out.println("\nAlgorithm 4 result:");
-            if (result4 != null) {
-                for (int val : result4) {
-                    System.out.print(val + " ");
+            
+                long end = System.nanoTime();
+                times[i] = (end - start) / 1_000_000;
+            
+                System.out.println(">>> " + algorithms[i]);
+                if (results[i] != null) {
+                    Arrays.sort(results[i]);
+                    System.out.print("Hitting Set: ");
+                    for (int val : results[i]) {
+                        System.out.print(val + " ");
+                    }
+                    System.out.println("\nValid: " + hsp.isValidHittingSet(results[i], sets));
+                } else {
+                    System.out.println("No hitting set of size ≤ k found.");
                 }
-            } else {
-                System.out.println("No hitting set of size ≤ k found.");
+            
+                System.out.println("Execution Time: " + times[i] + " ms");
+                System.out.println("----------------------------------------\n");
             }
-            System.out.println("\nTime: " + (end - start)/1_000_000 + " ms");
+            
     
         } catch (IOException e) {
             e.printStackTrace();
