@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 public class HittingSetProblem {
 
@@ -59,7 +61,7 @@ public class HittingSetProblem {
         int[] pickedSet = currentSets[randomIndex];
 
         // Get criticallity value for each element of pickedSet
-        int[] criticallityArray = getCriticallities(currentSets, pickedSet);
+        int[] criticallity = getCriticallities(currentSets, pickedSet);
 
         // Sort pickedSet based on criticallity of each element (descending order)
         for (int i = 0; i < pickedSet.length - 1; i++) {
@@ -69,8 +71,8 @@ public class HittingSetProblem {
 
                 if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
 
-                int critA = criticallityArray[i];
-                int critB = criticallityArray[j];
+                int critA = criticallity[i];
+                int critB = criticallity[j];
 
                 if (critB > critA || (critB == critA && b < a)) {
                     // swap elements in pickedSet
@@ -79,9 +81,9 @@ public class HittingSetProblem {
                     pickedSet[j] = temp;
 
                     // swap parallel criticallity values
-                    int tmpCrit = criticallityArray[i];
-                    criticallityArray[i] = criticallityArray[j];
-                    criticallityArray[j] = tmpCrit;
+                    int tmpCrit = criticallity[i];
+                    criticallity[i] = criticallity[j];
+                    criticallity[j] = tmpCrit;
                 }
             }
         }
@@ -95,7 +97,7 @@ public class HittingSetProblem {
             int[][] reducedProblem = reduceSets(currentSets, element);
             
             // Recursive call on reduced problem
-            int[] solution = algorithm1(reducedProblem, n, c, k - 1);
+            int[] solution = algorithm2(reducedProblem, n, c, k - 1);
             
             if(solution != null){ // if solution is found
                 // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
@@ -168,7 +170,7 @@ public class HittingSetProblem {
         int[] pickedSet = currentSets[setIndex];
 
         // Get criticallity value for each element of pickedSet
-        int[] criticallityArray = getCriticallities(currentSets, pickedSet);
+        int[] criticallity = getCriticallities(currentSets, pickedSet);
 
         // Sort pickedSet based on criticallity of each element (descending order)
         for (int i = 0; i < pickedSet.length - 1; i++) {
@@ -178,8 +180,8 @@ public class HittingSetProblem {
 
                 if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
 
-                int critA = criticallityArray[i];
-                int critB = criticallityArray[j];
+                int critA = criticallity[i];
+                int critB = criticallity[j];
 
                 if (critB > critA || (critB == critA && b < a)) {
                     // swap elements in pickedSet
@@ -188,9 +190,9 @@ public class HittingSetProblem {
                     pickedSet[j] = temp;
 
                     // swap parallel criticallity values
-                    int tmpCrit = criticallityArray[i];
-                    criticallityArray[i] = criticallityArray[j];
-                    criticallityArray[j] = tmpCrit;
+                    int tmpCrit = criticallity[i];
+                    criticallity[i] = criticallity[j];
+                    criticallity[j] = tmpCrit;
                 }
             }
         }
@@ -204,7 +206,7 @@ public class HittingSetProblem {
             int[][] reducedProblem = reduceSets(currentSets, element);
             
             // Recursive call on reduced problem
-            int[] solution = algorithm1(reducedProblem, n, c, k - 1);
+            int[] solution = algorithm4(reducedProblem, n, c, k - 1);
             
             if(solution != null){ // if solution is found
                 // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
@@ -263,7 +265,7 @@ public class HittingSetProblem {
 
     // Helper method to get criticallity values for alle elements of pickedSet
     private int[] getCriticallities(int[][] currentSets, int[] pickedSet){
-        int[] criticallityArray = new int[pickedSet.length];
+        int[] criticallity = new int[pickedSet.length];
 
         for(int i = 0; i < pickedSet.length; i++){ // for each element of pickedSet
             int element = pickedSet[i];
@@ -278,12 +280,12 @@ public class HittingSetProblem {
                 }
 
                 if (found) {
-                    criticallityArray[i]++;
+                    criticallity[i]++;
                 }
             }
         }
 
-        return criticallityArray;
+        return criticallity;
     }
 
     // Helper method to find subset B with least number of elements
@@ -370,124 +372,198 @@ public class HittingSetProblem {
 
     // Helper method that reads the file and returns data read
     private Object[] loadData(String filename) throws IOException{
-        BufferedReader reader = new BufferedReader(new FileReader(filename));
-        String[] line1 = reader.readLine().trim().split("\\s+");
-        int n = Integer.parseInt(line1[0]);
-        int m = Integer.parseInt(line1[1]);
-        int c = Integer.parseInt(line1[2]);
-        int k = Integer.parseInt(line1[3]);
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            // String[] line1 = reader.readLine().trim().split("\\s+");
+            // int n = Integer.parseInt(line1[0]);
+            // int m = Integer.parseInt(line1[1]);
+            // int c = Integer.parseInt(line1[2]);
+            // int k = Integer.parseInt(line1[3]);
 
-        int[][] sets = new int[m][c];
-        for(int i = 0; i < m; i++){
-            String line[] = reader.readLine().trim().split("\\s+");
-            for(int j = 0; j < line.length; j++){
-                sets[i][j] = Integer.parseInt(line[j]);
+            // Manually entering
+            int n = 100;
+            int m = 1000;
+            int c = 5;
+            int k = 1;
+
+            int[][] sets = new int[m][c];
+            for(int i = 0; i < m; i++){
+                String line[] = reader.readLine().trim().split("\\s+");
+                for(int j = 0; j < line.length; j++){
+                    sets[i][j] = Integer.parseInt(line[j]);
+                }
+                // if B set's length is < than c, it automatically gets filled with 0s
             }
-            // if B set's length is < than c, it automatically gets filled with 0s
-        }
 
-        reader.close();
-        return new Object[]{n, m, c, k, sets};
+            reader.close();
+            return new Object[]{n, m, c, k, sets};
+        }
     }
 
-    
+    /* EXPERIMENT MAIN METHOD */
     public static void main(String[] args) {
         try {
-            boolean experimentMode = false;
-
             HittingSetProblem hsp = new HittingSetProblem();
 
-            int n, m, c, k;
-            int[][] sets;
-
-            if(experimentMode){
-                n = 6;
-                m = 8;
-                c = 3;
-                k = 3;
-                
-                // Generate random test data
-                Object[] data = hsp.generateRandomData(n, m, c, k);
-                sets = (int[][])data[0];
-                
-                System.out.println("[EXPERIMENT MODE] Generated random data:");
-                System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
-            } else{
-                // Regular Mode - read values from file
-                Object[] data = hsp.loadData("sets.dat");
-                n = (int)data[0];
-                m = (int)data[1];
-                c = (int)data[2];
-                k = (int)data[3];
-                sets = (int[][])data[4];
-
-                System.out.println("[CORRECTNESS MODE] Loaded Data:");
-                System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
-            }
-
-            // Print the sets
-            for(int i = 0; i < m; i++) {
-                System.out.print("B[" + i + "] = {");
-                for(int j = 0; j < sets[i].length; j++) {
-                    if (sets[i][j] != 0) {
-                        System.out.print(sets[i][j] + ", ");
-                    }
-                }
-                System.out.println("}");
-            }
-            System.out.println("");
+            Object[] data = hsp.loadData("script-input.txt");
+            
+            int n = 100;
+            int m = 1000;
+            int c = 5;
+            int maxK = 20;
+            int[][] sets = (int[][])data[4];
 
             String[] algorithms = {
-                "Algorithm 1",
-                "Algorithm 2",
+                // "Algorithm 1",
+                // "Algorithm 2",
                 "Algorithm 3",
                 "Algorithm 4"
             };
-            
-            int[][] results = new int[4][];
-            long[] times = new long[4];
-            
-            for (int i = 0; i < 4; i++) {
-                long start = System.nanoTime();
-            
-                switch (i) {
-                    case 0:
-                        results[i] = hsp.algorithm1(sets, n, c, k);
-                        break;
-                    case 1:
-                        results[i] = hsp.algorithm2(sets, n, c, k);
-                        break;
-                    case 2:
-                        results[i] = hsp.algorithm3(sets, n, c, k);
-                        break;
-                    case 3:
-                        results[i] = hsp.algorithm4(sets, n, c, k);
-                        break;
-                }
-            
-                long end = System.nanoTime();
-                times[i] = (end - start) / 1_000_000;
-            
-                System.out.println(">>> " + algorithms[i]);
-                if (results[i] != null) {
-                    Arrays.sort(results[i]);
-                    System.out.print("Hitting Set: ");
-                    for (int val : results[i]) {
-                        System.out.print(val + " ");
+
+            PrintWriter writer = new PrintWriter(new FileWriter("./results/experiment_results.txt"));
+            writer.println("Hitting Set Experiment Results");
+            writer.println("=======================================");
+            writer.println("k\tAlgorithm\tTime(ms)\tResult");
+
+            for (int k = 14; k <= maxK; k++) {
+                System.out.println("\n========== Testing for k = " + k + " ==========");
+                
+                for (int a = 0; a < 2; a++) {
+                    long totalTime = 0;
+                    boolean timedOut = false;
+                    int[] lastResult = null;
+
+                    for (int rep = 1; rep <= 3; rep++) {
+                        long start = System.nanoTime();
+                        int[] result = null;
+
+                        switch (a) {
+                            case 0: result = hsp.algorithm3(sets, n, c, k); break;
+                            case 1: result = hsp.algorithm4(sets, n, c, k); break;
+                            // case 2: result = hsp.algorithm3(sets, n, c, k); break;
+                            // case 3: result = hsp.algorithm4(sets, n, c, k); break;
+                        }
+
+                        long end = System.nanoTime();
+                        long elapsed = (end - start) / 1_000_000; // in ms
+
+                        if (elapsed > 3600000) { // 1 hour
+                            System.out.println("Algorithm " + (a + 3) + "exceeded 1h with time: " + elapsed);
+                            timedOut = true;
+                            break;
+                        }
+
+                        totalTime += elapsed;
+                        lastResult = result;
                     }
-                    System.out.println("\nValid: " + hsp.isValidHittingSet(results[i], sets));
-                } else {
-                    System.out.println("No hitting set of size ≤ k found.");
+
+                    if (timedOut) {
+                        writer.println(k + "\t" + algorithms[a] + "\t" + "> 3600000" + "\tTimeout (1 hour)");
+                        System.out.println("[" + algorithms[a] + "] k=" + k + " exceeded 1 hour.");
+                    } else {
+                        long avgTime = totalTime / 3;
+                        boolean isValid = lastResult != null && hsp.isValidHittingSet(lastResult, sets);
+                        String res = (lastResult != null ? "Valid=" + isValid : "No solution");
+                        writer.println(k + "\t" + algorithms[a] + "\t" + avgTime + "\t" + res);
+                        System.out.println("[" + algorithms[a] + "] k=" + k + " avgTime=" + avgTime + "ms | " + res);
+                    }
                 }
-            
-                System.out.println("Execution Time: " + times[i] + " ms");
-                System.out.println("----------------------------------------\n");
             }
-            
-    
-        } catch (IOException e) {
+
+            writer.close();
+            System.out.println("\nResults saved to: experiment_results.txt");
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+    /* NORMAL MAIN METHOD */
+    // public static void main(String[] args) {
+    //     try {
+    //         boolean experimentMode = false;
+
+    //         HittingSetProblem hsp = new HittingSetProblem();
+
+    //         int n, m, c, k;
+    //         int[][] sets;
+
+    //         if(experimentMode){
+    //             n = 6;
+    //             m = 8;
+    //             c = 3;
+    //             k = 3;
+                
+    //             // Generate random test data
+    //             Object[] data = hsp.generateRandomData(n, m, c, k);
+    //             sets = (int[][])data[0];
+                
+    //             System.out.println("[EXPERIMENT MODE] Generated random data:");
+    //             System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
+    //         } else{
+    //             // Regular Mode - read values from file
+    //             Object[] data = hsp.loadData("tutorial-ok.dat");
+    //             n = (int)data[0];
+    //             m = (int)data[1];
+    //             c = (int)data[2];
+    //             k = (int)data[3];
+    //             sets = (int[][])data[4];
+
+    //             System.out.println("[CORRECTNESS MODE] Loaded Data:");
+    //             System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
+    //         }
+
+    //         String[] algorithms = {
+    //             "Algorithm 1",
+    //             "Algorithm 2",
+    //             "Algorithm 3",
+    //             "Algorithm 4"
+    //         };
+            
+    //         int[][] results = new int[4][];
+    //         long[] times = new long[4];
+
+    //         for (int i = 0; i < 4; i++) {
+    //             long start = System.nanoTime();
+            
+    //             switch (i) {
+    //                 case 0:
+    //                     results[i] = hsp.algorithm1(sets, n, c, k);
+    //                     break;
+    //                 case 1:
+    //                     results[i] = hsp.algorithm2(sets, n, c, k);
+    //                     break;
+    //                 case 2:
+    //                     results[i] = hsp.algorithm3(sets, n, c, k);
+    //                     break;
+    //                 case 3:
+    //                     results[i] = hsp.algorithm4(sets, n, c, k);
+    //                     break;
+    //             }
+            
+    //             long end = System.nanoTime();
+    //             times[i] = (end - start) / 1_000_000;
+            
+    //             System.out.println(">>> " + algorithms[i]);
+    //             if (results[i] != null) {
+    //                 Arrays.sort(results[i]);
+    //                 System.out.print("Hitting Set: ");
+    //                 for (int val : results[i]) {
+    //                     System.out.print(val + " ");
+    //                 }
+    //                 System.out.println("\nValid: " + hsp.isValidHittingSet(results[i], sets));
+    //             } else {
+    //                 System.out.println("No hitting set of size ≤ k found.");
+    //             }
+            
+    //             System.out.println("Execution Time: " + times[i] + " ms");
+    //             System.out.println("----------------------------------------\n");
+    //         }
+            
+    
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
 }
