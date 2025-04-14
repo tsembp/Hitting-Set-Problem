@@ -61,7 +61,7 @@ public class HittingSetProblem {
         int[] pickedSet = currentSets[randomIndex];
 
         // Get criticallity value for each element of pickedSet
-        int[] criticallity = getCriticallities(currentSets, pickedSet);
+        int[] criticallities = getCriticallities(currentSets, n);
 
         // Sort pickedSet based on criticallity of each element (descending order)
         for (int i = 0; i < pickedSet.length - 1; i++) {
@@ -71,19 +71,14 @@ public class HittingSetProblem {
 
                 if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
 
-                int critA = criticallity[i];
-                int critB = criticallity[j];
+                int critA = criticallities[a];
+                int critB = criticallities[b];
 
                 if (critB > critA || (critB == critA && b < a)) {
                     // swap elements in pickedSet
                     int temp = pickedSet[i];
                     pickedSet[i] = pickedSet[j];
                     pickedSet[j] = temp;
-
-                    // swap parallel criticallity values
-                    int tmpCrit = criticallity[i];
-                    criticallity[i] = criticallity[j];
-                    criticallity[j] = tmpCrit;
                 }
             }
         }
@@ -170,7 +165,7 @@ public class HittingSetProblem {
         int[] pickedSet = currentSets[setIndex];
 
         // Get criticallity value for each element of pickedSet
-        int[] criticallity = getCriticallities(currentSets, pickedSet);
+        int[] criticallities = getCriticallities(currentSets, n);
 
         // Sort pickedSet based on criticallity of each element (descending order)
         for (int i = 0; i < pickedSet.length - 1; i++) {
@@ -180,19 +175,14 @@ public class HittingSetProblem {
 
                 if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
 
-                int critA = criticallity[i];
-                int critB = criticallity[j];
+                int critA = criticallities[a];
+                int critB = criticallities[b];
 
                 if (critB > critA || (critB == critA && b < a)) {
                     // swap elements in pickedSet
                     int temp = pickedSet[i];
                     pickedSet[i] = pickedSet[j];
                     pickedSet[j] = temp;
-
-                    // swap parallel criticallity values
-                    int tmpCrit = criticallity[i];
-                    criticallity[i] = criticallity[j];
-                    criticallity[j] = tmpCrit;
                 }
             }
         }
@@ -264,28 +254,16 @@ public class HittingSetProblem {
     }
 
     // Helper method to get criticallity values for alle elements of pickedSet
-    private int[] getCriticallities(int[][] currentSets, int[] pickedSet){
-        int[] criticallity = new int[pickedSet.length];
+    private int[] getCriticallities(int[][] currentSets, int n){
+        int[] criticallities = new int[n + 1];
 
-        for(int i = 0; i < pickedSet.length; i++){ // for each element of pickedSet
-            int element = pickedSet[i];
-            if(element == 0) continue; // skip 0 (indicates pickedSet.length < c)
-
-            for(int j = 0; j < currentSets.length; j++){ // for each set Bi
-                boolean found = false;
-                for(int p = 0; p < currentSets[j].length; p++){ // for each element of Bi
-                    if(currentSets[j][p] == element){ // if that element is equal to pickedSet's element
-                        found = true;
-                    }
-                }
-
-                if (found) {
-                    criticallity[i]++;
-                }
+        for (int[] subset : currentSets){
+            for(int element : subset){
+                if(element != 0) criticallities[element]++;
             }
         }
 
-        return criticallity;
+        return criticallities;
     }
 
     // Helper method to find subset B with least number of elements
@@ -336,40 +314,6 @@ public class HittingSetProblem {
         return true;
     }
 
-    // Helper method to generate random B sets based on given parameters
-    private Object[] generateRandomData(int n, int m, int c, int k) {
-        int[][] sets = new int[m][c];
-        
-        // Generate random sets
-        for (int i = 0; i < m; i++) {
-            // For each set, decide how many elements it will have (between 1 and c)
-            int setSize = 1 + (int)(Math.random() * c);
-            
-            // Use a boolean array to track which elements are already in the set
-            boolean[] used = new boolean[n+1];
-            
-            // Fill the set with random elements
-            for (int j = 0; j < setSize; j++) {
-                int element;
-                do {
-                    // Generate elements from 1 to n (not 0)
-                    element = 1 + (int)(Math.random() * n);
-                } while (used[element]); // Ensure no duplicates in the same set
-                
-                sets[i][j] = element;
-                used[element] = true;
-            }
-            
-            // Sort the elements in the set for better readability
-            Arrays.sort(sets[i], 0, setSize);
-        }
-        
-        // Ensure the generated instance has a hitting set of size ≤ k
-        // This is a simplistic approach - real instances might need more sophisticated generation
-        
-        return new Object[]{sets, n, m, c, k};
-    }
-
     // Helper method that reads the file and returns data read
     private Object[] loadData(String filename) throws IOException{
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
@@ -383,7 +327,7 @@ public class HittingSetProblem {
             int n = 100;
             int m = 1000;
             int c = 5;
-            int k = 1;
+            int k = 20;
 
             int[][] sets = new int[m][c];
             for(int i = 0; i < m; i++){
@@ -403,63 +347,64 @@ public class HittingSetProblem {
     public static void main(String[] args) {
         try {
             HittingSetProblem hsp = new HittingSetProblem();
-
-            Object[] data = hsp.loadData("script-input.txt");
-            
+    
+            Object[] data = hsp.loadData("./inputs/script-input.txt");
             int n = 100;
             int m = 1000;
             int c = 5;
             int maxK = 20;
-            int[][] sets = (int[][])data[4];
-
+            int[][] sets = (int[][]) data[4];
+    
             String[] algorithms = {
-                // "Algorithm 1",
-                // "Algorithm 2",
-                "Algorithm 3",
+                "Algorithm 2",
                 "Algorithm 4"
             };
-
+    
+            boolean[] runAlgo = {true, true};
+    
             PrintWriter writer = new PrintWriter(new FileWriter("./results/experiment_results.txt"));
             writer.println("Hitting Set Experiment Results");
             writer.println("=======================================");
             writer.println("k\tAlgorithm\tTime(ms)\tResult");
-
-            for (int k = 14; k <= maxK; k++) {
+    
+            for (int k = 1; k <= maxK; k++) {
                 System.out.println("\n========== Testing for k = " + k + " ==========");
-                
+    
                 for (int a = 0; a < 2; a++) {
+                    if (!runAlgo[a]) {
+                        System.out.println("[" + algorithms[a] + "] skipped (timed out in previous k)");
+                        continue;
+                    }
+    
                     long totalTime = 0;
                     boolean timedOut = false;
                     int[] lastResult = null;
-
+    
                     for (int rep = 1; rep <= 3; rep++) {
                         long start = System.nanoTime();
                         int[] result = null;
-
-                        switch (a) {
-                            case 0: result = hsp.algorithm3(sets, n, c, k); break;
-                            case 1: result = hsp.algorithm4(sets, n, c, k); break;
-                            // case 2: result = hsp.algorithm3(sets, n, c, k); break;
-                            // case 3: result = hsp.algorithm4(sets, n, c, k); break;
+    
+                        if (a == 0) {
+                            result = hsp.algorithm2(sets, n, c, k);
+                        } else if (a == 1) {
+                            result = hsp.algorithm4(sets, n, c, k);
                         }
-
-                        long end = System.nanoTime();
-                        long elapsed = (end - start) / 1_000_000; // in ms
-
-                        if (elapsed > 3600000) { // 1 hour
-                            System.out.println("Algorithm " + (a + 3) + "exceeded 1h with time: " + elapsed);
+    
+                        long elapsed = (System.nanoTime() - start) / 1_000_000; // ms
+    
+                        if (elapsed > 3600000) { // 1 hour = 3,600,000 ms
+                            System.out.println("[" + algorithms[a] + "] k=" + k + " exceeded 1 hour on repetition " + rep);
+                            writer.println(k + "\t" + algorithms[a] + "\t>3600000\tTimeout (1 hour)");
+                            runAlgo[a] = false;
                             timedOut = true;
                             break;
                         }
-
+    
                         totalTime += elapsed;
                         lastResult = result;
                     }
-
-                    if (timedOut) {
-                        writer.println(k + "\t" + algorithms[a] + "\t" + "> 3600000" + "\tTimeout (1 hour)");
-                        System.out.println("[" + algorithms[a] + "] k=" + k + " exceeded 1 hour.");
-                    } else {
+    
+                    if (!timedOut) {
                         long avgTime = totalTime / 3;
                         boolean isValid = lastResult != null && hsp.isValidHittingSet(lastResult, sets);
                         String res = (lastResult != null ? "Valid=" + isValid : "No solution");
@@ -468,10 +413,10 @@ public class HittingSetProblem {
                     }
                 }
             }
-
+    
             writer.close();
             System.out.println("\nResults saved to: experiment_results.txt");
-
+    
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -502,7 +447,7 @@ public class HittingSetProblem {
     //             System.out.println("n:" + n + " m:" + m + " c:" + c + " k:" + k);
     //         } else{
     //             // Regular Mode - read values from file
-    //             Object[] data = hsp.loadData("tutorial-ok.dat");
+    //             Object[] data = hsp.loadData("./inputs/tutorial-ok.dat");
     //             n = (int)data[0];
     //             m = (int)data[1];
     //             c = (int)data[2];
@@ -537,7 +482,7 @@ public class HittingSetProblem {
     //                     results[i] = hsp.algorithm3(sets, n, c, k);
     //                     break;
     //                 case 3:
-    //                     results[i] = hsp.algorithm4(sets, n, c, k);
+    //                     // results[i] = hsp.algorithm4(sets, n, c, k);
     //                     break;
     //             }
             
@@ -565,5 +510,10 @@ public class HittingSetProblem {
     //         e.printStackTrace();
     //     }
     // }
+
+    private Object[] generateRandomData(int n, int m, int c, int k) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateRandomData'");
+    }
 
 }

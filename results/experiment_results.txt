@@ -1,0 +1,44 @@
+Hitting Set Experiment Results
+=======================================
+k	Algorithm	Time(ms)	Result
+1	Algorithm 2	1	No solution
+1	Algorithm 4	0	No solution
+
+2	Algorithm 2	3	No solution
+2	Algorithm 4	1	No solution
+
+3	Algorithm 2	5	No solution
+3	Algorithm 4	4	No solution
+
+4	Algorithm 2	19	No solution
+4	Algorithm 4	10	No solution
+
+5	Algorithm 2	91	No solution
+5	Algorithm 4	36	No solution
+
+6	Algorithm 2	374	No solution
+6	Algorithm 4	97	No solution
+
+7	Algorithm 2	1500	No solution
+7	Algorithm 4	327	No solution
+
+8	Algorithm 2	6387	No solution
+8	Algorithm 4	1171	No solution
+
+9	Algorithm 2	26247	No solution
+9	Algorithm 4	4126	No solution
+
+10	Algorithm 2	121882	No solution
+10	Algorithm 4	17618	No solution
+
+11	Algorithm 2	547424	No solution
+11	Algorithm 4	54256	No solution
+
+12	Algorithm 2	2863342	No solution
+12	Algorithm 4	278004	No solution
+
+13	Algorithm 2	>3600000	Timeout (1 hour)
+13	Algorithm 4	821392	No solution
+
+14	Algorithm 4	2978799	No solution
+15	Algorithm 4	>3600000	Timeout (1 hour)

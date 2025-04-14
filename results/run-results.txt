@@ -8,66 +8,67 @@ k	Algorithm	Time(ms)	Result
 1	Algorithm 4	0	    No solution
 
 2	Algorithm 1	2	    No solution
-2	Algorithm 2	2	    No solution
+2	Algorithm 2	3	    No solution
 2	Algorithm 3	1	    No solution
 2	Algorithm 4	1	    No solution
 
 3	Algorithm 1	8	    No solution
-3	Algorithm 2	6	    No solution
+3	Algorithm 2	5	    No solution
 3	Algorithm 3	3	    No solution
 3	Algorithm 4	4	    No solution
 
 4	Algorithm 1	28	    No solution
-4	Algorithm 2	27	    No solution
+4	Algorithm 2	19	    No solution
 4	Algorithm 3	13	    No solution
-4	Algorithm 4	13	    No solution
+4	Algorithm 4	10	    No solution
 
 5	Algorithm 1	128	    No solution
-5	Algorithm 2	127	    No solution
+5	Algorithm 2	91	    No solution
 5	Algorithm 3	38	    No solution
-5	Algorithm 4	43	    No solution
+5	Algorithm 4	36	    No solution
 
 6	Algorithm 1	488	    No solution
-6	Algorithm 2	527	    No solution
+6	Algorithm 2	374	    No solution
 6	Algorithm 3	132	    No solution
-6	Algorithm 4	147	    No solution
+6	Algorithm 4	97	    No solution
 
 7	Algorithm 1	2167	No solution
-7	Algorithm 2	2338	No solution
+7	Algorithm 2	1500	No solution
 7	Algorithm 3	471	    No solution
-7	Algorithm 4	528	    No solution
+7	Algorithm 4	327	    No solution
 
 8	Algorithm 1	8917	No solution
-8	Algorithm 2	9498	No solution
+8	Algorithm 2	6387	No solution
 8	Algorithm 3	1802	No solution
-8	Algorithm 4	2108	No solution
+8	Algorithm 4	1171	No solution
 
 9	Algorithm 1	38395	No solution
-9	Algorithm 2	46893	No solution
+9	Algorithm 2	26247	No solution
 9	Algorithm 3	6109	No solution
-9	Algorithm 4	6453	No solution
+9	Algorithm 4	4126	No solution
 
 10	Algorithm 1	163910	No solution
-10	Algorithm 2	199682	No solution
+10	Algorithm 2	121882	No solution
 10	Algorithm 3	20441	No solution
-10	Algorithm 4	23479	No solution
+10	Algorithm 4	17618	No solution
 
 11	Algorithm 1	739864	No solution
-11	Algorithm 2	789288	No solution
+11	Algorithm 2	547424	No solution
 11	Algorithm 3	79788	No solution
-11	Algorithm 4	88401	No solution
+11	Algorithm 4	54256	No solution
 
 12	Algorithm 1	2100981	No solution
-12	Algorithm 2	3120640	No solution
+12	Algorithm 2	2863342	No solution
 12  Algorithm 3 244489  No solution
-12  Algorithm 4 217549  No solution
+12  Algorithm 4 278004  No solution
 
 13  Algorithm 1 exceeded 1 hour
 13  Algorithm 2 exceeded 1 hour
 13  Algorithm 3 1100720 No solution
-13  Algorithm 4 755638  No solution
+13  Algorithm 4 821392  No solution
 
 14  Algorithm 3 3533742 No solution
-14  Algorithm 4 exceeded 1 hour
+14  Algorithm 4 2978799 No solution
 
-15  Algorithm 3 exceeded 1 hour (3778567)
+15  Algorithm 3 exceeded 1 hour
+15	Algorithm 4	exceeded 1 hour
