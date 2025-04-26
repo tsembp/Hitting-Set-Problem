@@ -317,17 +317,11 @@ public class HittingSetProblem {
     // Helper method that reads the file and returns data read
     private Object[] loadData(String filename) throws IOException{
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            // String[] line1 = reader.readLine().trim().split("\\s+");
-            // int n = Integer.parseInt(line1[0]);
-            // int m = Integer.parseInt(line1[1]);
-            // int c = Integer.parseInt(line1[2]);
-            // int k = Integer.parseInt(line1[3]);
-
-            // Manually entering
-            int n = 100;
-            int m = 1000;
-            int c = 5;
-            int k = 20;
+            String[] line1 = reader.readLine().trim().split("\\s+");
+            int n = Integer.parseInt(line1[0]);
+            int m = Integer.parseInt(line1[1]);
+            int c = Integer.parseInt(line1[2]);
+            int k = Integer.parseInt(line1[3]);
 
             int[][] sets = new int[m][c];
             for(int i = 0; i < m; i++){
@@ -348,74 +342,84 @@ public class HittingSetProblem {
         try {
             HittingSetProblem hsp = new HittingSetProblem();
     
-            Object[] data = hsp.loadData("./inputs/script-input.txt");
-            int n = 100;
-            int m = 1000;
-            int c = 5;
-            int maxK = 20;
+            Object[] data = hsp.loadData("script-3-input.txt");
+            int n = (int) data[0];
+            int m = (int) data[1];
+            int c = (int) data[2];
+            int k = (int) data[3];
             int[][] sets = (int[][]) data[4];
     
             String[] algorithms = {
+                "Algorithm 1",
                 "Algorithm 2",
+                "Algorithm 3",
                 "Algorithm 4"
             };
     
-            boolean[] runAlgo = {true, true};
+            boolean[] runAlgo = {true, true, true, true};
     
-            PrintWriter writer = new PrintWriter(new FileWriter("./results/experiment_results.txt"));
+            PrintWriter writer = new PrintWriter(new FileWriter("./results/experiment2_results.txt"));
             writer.println("Hitting Set Experiment Results");
             writer.println("=======================================");
             writer.println("k\tAlgorithm\tTime(ms)\tResult");
     
-            for (int k = 1; k <= maxK; k++) {
-                System.out.println("\n========== Testing for k = " + k + " ==========");
-    
-                for (int a = 0; a < 2; a++) {
-                    if (!runAlgo[a]) {
-                        System.out.println("[" + algorithms[a] + "] skipped (timed out in previous k)");
-                        continue;
+            for (int a = 0; a < 4; a++) {
+                if (!runAlgo[a]) {
+                    System.out.println("[" + algorithms[a] + "] skipped (timed out in previous k)");
+                    continue;
+                }
+
+                long totalTime = 0;
+                boolean timedOut = false;
+                int[] lastResult = null;
+
+                for (int rep = 1; rep <= 10; rep++) {
+                    long start = System.nanoTime();
+                    int[] result = null;
+
+                    if (a == 0) {
+                        result = hsp.algorithm1(sets, n, c, k);
+                    } else if (a == 1) {
+                        result = hsp.algorithm2(sets, n, c, k);
+                    } else if (a == 2){
+                        result = hsp.algorithm3(sets, n, c, k);
+                    } else if (a == 3){
+                        result = hsp.algorithm4(sets, n, c, k);
                     }
-    
-                    long totalTime = 0;
-                    boolean timedOut = false;
-                    int[] lastResult = null;
-    
-                    for (int rep = 1; rep <= 3; rep++) {
-                        long start = System.nanoTime();
-                        int[] result = null;
-    
-                        if (a == 0) {
-                            result = hsp.algorithm2(sets, n, c, k);
-                        } else if (a == 1) {
-                            result = hsp.algorithm4(sets, n, c, k);
-                        }
-    
-                        long elapsed = (System.nanoTime() - start) / 1_000_000; // ms
-    
-                        if (elapsed > 3600000) { // 1 hour = 3,600,000 ms
-                            System.out.println("[" + algorithms[a] + "] k=" + k + " exceeded 1 hour on repetition " + rep);
-                            writer.println(k + "\t" + algorithms[a] + "\t>3600000\tTimeout (1 hour)");
-                            runAlgo[a] = false;
-                            timedOut = true;
-                            break;
-                        }
-    
-                        totalTime += elapsed;
-                        lastResult = result;
+
+                    long elapsed = (System.nanoTime() - start) / 1_000_000; // ms
+
+                    if (elapsed > 3600000) { // 1 hour = 3,600,000 ms
+                        System.out.println("[" + algorithms[a] + "] k=" + k + " exceeded 1 hour on repetition " + rep);
+                        writer.println(k + "\t" + algorithms[a] + "\t>3600000\tTimeout (1 hour)");
+                        runAlgo[a] = false;
+                        timedOut = true;
+                        break;
                     }
-    
-                    if (!timedOut) {
-                        long avgTime = totalTime / 3;
-                        boolean isValid = lastResult != null && hsp.isValidHittingSet(lastResult, sets);
-                        String res = (lastResult != null ? "Valid=" + isValid : "No solution");
-                        writer.println(k + "\t" + algorithms[a] + "\t" + avgTime + "\t" + res);
-                        System.out.println("[" + algorithms[a] + "] k=" + k + " avgTime=" + avgTime + "ms | " + res);
+
+                    totalTime += elapsed;
+                    lastResult = result;
+                }
+
+                if (!timedOut) {
+                    long avgTime = totalTime / 10;
+                    boolean isValid = lastResult != null && hsp.isValidHittingSet(lastResult, sets);
+                    String res = (lastResult != null ? "Valid=" + isValid : "No solution");
+                    writer.println(k + "\t" + algorithms[a] + "\t" + avgTime + "\t" + res);
+                    System.out.println("[" + algorithms[a] + "] k=" + k + " avgTime=" + avgTime + "ms | " + res);
+                    if (lastResult != null) {
+                        Arrays.sort(lastResult);
+                        System.out.print("Hitting Set (sorted): ");
+                        for (int val : lastResult) {
+                            System.out.print(val + " ");
+                        }
+                        System.out.println();
                     }
                 }
             }
-    
+
             writer.close();
-            System.out.println("\nResults saved to: experiment_results.txt");
+            System.out.println("\nResults saved.");
     
         } catch (Exception e) {
             e.printStackTrace();
