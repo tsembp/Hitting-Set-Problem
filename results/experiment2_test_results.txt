@@ -1,0 +1,6 @@
+Hitting Set Experiment Results
+=======================================
+k    repetition  Algorithm      Time(ms)    Hitting Set                             Validity
+20   1           Algorithm 4    7           [115, 132, 348, 276, 27, 40, 428, 65, 434, 406, 374, 487, 51, 418, 452, 6, 306, 253, 313, 7] Valid
+20   2           Algorithm 4    3           [115, 132, 348, 276, 27, 40, 428, 65, 434, 406, 374, 487, 51, 418, 452, 6, 306, 253, 313, 7] Valid
+20   3           Algorithm 4    4           [115, 132, 34

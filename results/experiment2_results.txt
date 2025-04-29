@@ -1,7 +1,0 @@
-Hitting Set Experiment Results
-=======================================
-k	Algorithm	Time(ms)	Result
-8	Algorithm 1	617582	Valid=true
-8	Algorithm 2	4	Valid=true
-8	Algorithm 3	4	Valid=true
-8	Algorithm 4	4	Valid=true

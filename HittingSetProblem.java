@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
@@ -17,7 +18,7 @@ public class HittingSetProblem {
 
         // Select random set
         int randomIndex = (int)(Math.random() * currentSets.length);
-        int[] pickedSet = currentSets[randomIndex];
+        int[] pickedSet = shuffleArray(currentSets[randomIndex]);
 
         // For each element of pickedSet, attempt to find result by removing it
         for(int i = 0; i < pickedSet.length; i++){
@@ -122,7 +123,7 @@ public class HittingSetProblem {
 
         // Select subset B with least amount of elements inside
         int setIndex = findSetWithLeastElements(currentSets, c);
-        int[] pickedSet = currentSets[setIndex];
+        int[] pickedSet = shuffleArray(currentSets[setIndex]);
 
         // For each element of pickedSet, attempt to find result by removing it
         for(int i = 0; i < pickedSet.length; i++){
@@ -288,6 +289,21 @@ public class HittingSetProblem {
         return minIndex;
     }
 
+    // Helper method to shuffle array
+    private static int[] shuffleArray(int[] array) {
+        Random rand = new Random();
+        int[] result = array.clone();
+
+        for (int i = result.length - 1; i > 0; i--) {
+            int j = rand.nextInt(i + 1);
+            int temp = result[i];
+            result[i] = result[j];
+            result[j] = temp;
+        }
+
+        return result;
+    }
+
     // Helper method to validate hitting set
     private boolean isValidHittingSet(int[] hittingSet, int[][] sets) {
         for (int i = 0; i < sets.length; i++) {
@@ -337,12 +353,43 @@ public class HittingSetProblem {
         }
     }
 
+    @SuppressWarnings("unused")
+    private Object[] generateRandomData(int n, int m, int c, int k) {
+        int[][] sets = new int[m][c];
+ 
+        // Generate random sets
+        for (int i = 0; i < m; i++) {
+            // For each set, decide how many elements it will have (between 1 and c)
+            int setSize = 1 + (int)(Math.random() * c);
+
+            // Use a boolean array to track which elements are already in the set
+            boolean[] used = new boolean[n+1];
+
+            // Fill the set with random elements
+            for (int j = 0; j < setSize; j++) {
+                int element;
+                do {
+                    // Generate elements from 1 to n (not 0)
+                    element = 1 + (int)(Math.random() * n);
+                } while (used[element]); // Ensure no duplicates in the same set
+
+                sets[i][j] = element;
+                used[element] = true;
+            }
+
+            // Sort the elements in the set for better readability
+            Arrays.sort(sets[i], 0, setSize);
+        }
+ 
+        return new Object[]{sets, n, m, c, k};
+    }
+
     /* EXPERIMENT MAIN METHOD */
     public static void main(String[] args) {
         try {
             HittingSetProblem hsp = new HittingSetProblem();
     
-            Object[] data = hsp.loadData("script-3-input.txt");
+            Object[] data = hsp.loadData("script-6-input.txt");
             int n = (int) data[0];
             int m = (int) data[1];
             int c = (int) data[2];
@@ -350,72 +397,60 @@ public class HittingSetProblem {
             int[][] sets = (int[][]) data[4];
     
             String[] algorithms = {
-                "Algorithm 1",
-                "Algorithm 2",
+                "Algorithm 4",
                 "Algorithm 3",
-                "Algorithm 4"
+                "Algorithm 2",
+                "Algorithm 1"
             };
     
             boolean[] runAlgo = {true, true, true, true};
     
-            PrintWriter writer = new PrintWriter(new FileWriter("./results/experiment2_results.txt"));
+            PrintWriter writer = new PrintWriter(new FileWriter("./results/experiment2_test_results.txt"));
             writer.println("Hitting Set Experiment Results");
             writer.println("=======================================");
-            writer.println("k\tAlgorithm\tTime(ms)\tResult");
+            writer.printf("%-5s%-12s%-15s%-12s%-40s%s%n", "k", "repetition", "Algorithm", "Time(ms)", "Hitting Set", "Validity");
     
+            
+            int totalTime = 0;
             for (int a = 0; a < 4; a++) {
+                totalTime = 0;
                 if (!runAlgo[a]) {
                     System.out.println("[" + algorithms[a] + "] skipped (timed out in previous k)");
                     continue;
                 }
 
-                long totalTime = 0;
-                boolean timedOut = false;
-                int[] lastResult = null;
-
-                for (int rep = 1; rep <= 10; rep++) {
+                for (int rep = 1; rep <= 3; rep++) {
                     long start = System.nanoTime();
                     int[] result = null;
 
                     if (a == 0) {
-                        result = hsp.algorithm1(sets, n, c, k);
-                    } else if (a == 1) {
-                        result = hsp.algorithm2(sets, n, c, k);
-                    } else if (a == 2){
-                        result = hsp.algorithm3(sets, n, c, k);
-                    } else if (a == 3){
                         result = hsp.algorithm4(sets, n, c, k);
+                    } else if (a == 1) {
+                        result = hsp.algorithm3(sets, n, c, k);
+                    } else if (a == 2){
+                        result = hsp.algorithm2(sets, n, c, k);
+                    } else if (a == 3){
+                        result = hsp.algorithm1(sets, n, c, k);
                     }
 
-                    long elapsed = (System.nanoTime() - start) / 1_000_000; // ms
+                    long elapsed = (System.nanoTime() - start) / 1_000_000;
+                    totalTime += elapsed;
 
-                    if (elapsed > 3600000) { // 1 hour = 3,600,000 ms
+                    if (elapsed > 3600000) {
                         System.out.println("[" + algorithms[a] + "] k=" + k + " exceeded 1 hour on repetition " + rep);
                         writer.println(k + "\t" + algorithms[a] + "\t>3600000\tTimeout (1 hour)");
                         runAlgo[a] = false;
-                        timedOut = true;
                         break;
-                    }
-
-                    totalTime += elapsed;
-                    lastResult = result;
-                }
-
-                if (!timedOut) {
-                    long avgTime = totalTime / 10;
-                    boolean isValid = lastResult != null && hsp.isValidHittingSet(lastResult, sets);
-                    String res = (lastResult != null ? "Valid=" + isValid : "No solution");
-                    writer.println(k + "\t" + algorithms[a] + "\t" + avgTime + "\t" + res);
-                    System.out.println("[" + algorithms[a] + "] k=" + k + " avgTime=" + avgTime + "ms | " + res);
-                    if (lastResult != null) {
-                        Arrays.sort(lastResult);
-                        System.out.print("Hitting Set (sorted): ");
-                        for (int val : lastResult) {
-                            System.out.print(val + " ");
-                        }
-                        System.out.println();
+                    } else{
+                        System.out.println("[" + algorithms[a] + "] k=" + k + " on rep=" + rep + " ran for " + elapsed + "ms.");
+                        boolean isValid = (result != null) && hsp.isValidHittingSet(result, sets);
+                        String resultString = (result != null) ? Arrays.toString(result) : "null";
+                        String validity = isValid ? "Valid" : "Invalid";
+                        writer.printf("%-5d%-12d%-15s%-12d%s %s%n", k, rep, algorithms[a], elapsed, resultString, validity);
                     }
                 }
+                System.out.println("Average Time: " + (totalTime/3) + "ms");
+                System.out.println();
             }
 
             writer.close();
@@ -425,7 +460,6 @@ public class HittingSetProblem {
             e.printStackTrace();
         }
     }
-
 
     /* NORMAL MAIN METHOD */
     // public static void main(String[] args) {
@@ -515,9 +549,6 @@ public class HittingSetProblem {
     //     }
     // }
 
-    private Object[] generateRandomData(int n, int m, int c, int k) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateRandomData'");
-    }
+
 
 }
