@@ -1,0 +1,35 @@
+[Algorithm 4] k=11 on rep=1 ran for 769ms.
+[Algorithm 4] k=11 on rep=2 ran for 722ms.
+[Algorithm 4] k=11 on rep=3 ran for 690ms.
+[Algorithm 4] k=11 on rep=4 ran for 672ms.
+[Algorithm 4] k=11 on rep=5 ran for 621ms.
+[Algorithm 4] k=11 on rep=6 ran for 651ms.
+[Algorithm 4] k=11 on rep=7 ran for 612ms.
+[Algorithm 4] k=11 on rep=8 ran for 594ms.
+[Algorithm 4] k=11 on rep=9 ran for 599ms.
+[Algorithm 4] k=11 on rep=10 ran for 607ms.
+Average Time: 653ms
+
+[Algorithm 3] k=11 on rep=1 ran for 2667ms.
+[Algorithm 3] k=11 on rep=2 ran for 97577ms.
+[Algorithm 3] k=11 on rep=3 ran for 350875ms.
+[Algorithm 3] k=11 on rep=4 ran for 416597ms.
+[Algorithm 3] k=11 on rep=5 ran for 23592ms.
+[Algorithm 3] k=11 on rep=6 ran for 2774ms.
+[Algorithm 3] k=11 on rep=7 ran for 82517ms.
+[Algorithm 3] k=11 on rep=8 ran for 13ms.
+[Algorithm 3] k=11 on rep=9 ran for 204908ms.
+[Algorithm 3] k=11 on rep=10 ran for 125339ms.
+Average Time: 130685ms
+
+[Algorithm 2] k=11 on rep=1 ran for 30564ms.
+[Algorithm 2] k=11 on rep=2 ran for 1447773ms.
+[Algorithm 2] k=11 on rep=3 ran for 3311792ms.
+[Algorithm 2] k=11 on rep=4 ran for 9771ms.
+[Algorithm 2] k=11 on rep=5 ran for 17758ms.
+[Algorithm 2] k=11 on rep=6 ran for 66068ms.
+[Algorithm 2] k=11 on rep=7 ran for 17471ms.
+[Algorithm 2] k=11 on rep=8 ran for 815ms.
+[Algorithm 2] k=11 on rep=9 ran for 13920ms.
+[Algorithm 2] k=11 on rep=10 ran for 85826ms.
+Average Time: 500175ms
