@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class HittingSetProblem {
 
-    /* ALGORITHM VARIANTS */
+    /* ALGORITHMS */
 
     public int[] algorithm1(int[][] currentSets, int n, int c, int k){
         if(currentSets.length == 0) return new int[0];
@@ -19,7 +19,7 @@ public class HittingSetProblem {
         // For each element of pickedSet, attempt to find result by removing it
         for(int i = 0; i < pickedSet.length; i++){
             int element = pickedSet[i];
-            if(element == 0) continue; // skip 0 (indicates that set's length < c)
+            if(element == 0) continue; // skip 0 (set length < c)
 
             // Reduce problem by removing sets that contain element
             int[][] reducedProblem = reduceSets(currentSets, element);
@@ -27,19 +27,21 @@ public class HittingSetProblem {
             // Recursive call on reduced problem
             int[] solution = algorithm1(reducedProblem, n, c, k - 1);
             
-            if(solution != null){ // if solution is found
-                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
+            if(solution != null){ // solution found
+                // hitting set contains element we reduced the problem with + elements returned
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
 
-                // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
-                System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+                // copy solution's elements into hittingSet
+                for (int p = 0; p < solution.length; p++) {
+                    hittingSet[p + 1] = solution[p];
+                }
 
                 return hittingSet;
             }
         }
 
-        return null;
+        return null; // no solution
     }
 
     public int[] algorithm2(int[][] currentSets, int n, int c, int k){
@@ -59,7 +61,7 @@ public class HittingSetProblem {
                 int a = pickedSet[i];
                 int b = pickedSet[j];
 
-                if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
+                if (a == 0 || b == 0) continue; // ignore 0 (pickedSet.length < c)
 
                 int critA = criticallities[a];
                 int critB = criticallities[b];
@@ -76,7 +78,7 @@ public class HittingSetProblem {
         // For each element of pickedSet, attempt to find result by removing it
         for(int i = 0; i < pickedSet.length; i++){
             int element = pickedSet[i];
-            if(element == 0) continue; // skip 0 (indicates that set's length < c)
+            if(element == 0) continue; // skip 0 (set.length < c)
 
             // Reduce problem by removing sets that contain element
             int[][] reducedProblem = reduceSets(currentSets, element);
@@ -84,13 +86,15 @@ public class HittingSetProblem {
             // Recursive call on reduced problem
             int[] solution = algorithm2(reducedProblem, n, c, k - 1);
             
-            if(solution != null){ // if solution is found
-                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
+            if(solution != null){ // solution found
+                // hitting set contains element we reduced the problem with + elements returned
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
 
-                // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
-                System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+                // copy solution's elements into hittingSet
+                for (int p = 0; p < solution.length; p++) {
+                    hittingSet[p + 1] = solution[p];
+                }
 
                 return hittingSet;
             }
@@ -118,13 +122,15 @@ public class HittingSetProblem {
             // Recursive call on reduced problem
             int[] solution = algorithm3(reducedProblem, n, c, k - 1);
             
-            if(solution != null){ // if solution is found
-                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
+            if(solution != null){ // solution found
+                // hitting set contains element we reduced the problem with + elements returned
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
 
-                // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
-                System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+                // copy solution's elements into hittingSet
+                for (int p = 0; p < solution.length; p++) {
+                    hittingSet[p + 1] = solution[p];
+                }
 
                 return hittingSet;
             }
@@ -150,7 +156,7 @@ public class HittingSetProblem {
                 int a = pickedSet[i];
                 int b = pickedSet[j];
 
-                if (a == 0 || b == 0) continue; // ignore 0 (indicates that pickedSet.length < c)
+                if (a == 0 || b == 0) continue; // ignore 0 (pickedSet.length < c)
 
                 int critA = criticallities[a];
                 int critB = criticallities[b];
@@ -175,13 +181,15 @@ public class HittingSetProblem {
             // Recursive call on reduced problem
             int[] solution = algorithm4(reducedProblem, n, c, k - 1);
             
-            if(solution != null){ // if solution is found
-                // hitting set is the set: element we reduced the problem with + elements returned from previous recursive call
+            if(solution != null){ // solution found
+                // hitting set contains element we reduced the problem with + elements returned
                 int[] hittingSet = new int[solution.length + 1];
                 hittingSet[0] = element;
 
-                // copy solution.length elements of solution starting from index=0, into hitting set, starting from its index=1
-                System.arraycopy(solution, 0, hittingSet, 1, solution.length);
+                // copy solution's elements into hittingSet
+                for (int p = 0; p < solution.length; p++) {
+                    hittingSet[p + 1] = solution[p];
+                }
 
                 return hittingSet;
             }
@@ -207,8 +215,8 @@ public class HittingSetProblem {
             if(!found) count++;
         }
         
-        int[][] reduced = new int[count][currentSets[0].length]; // new array to represent sets, having removed sets that contain element
-        int setIndex = 0; // index to keep track of sets that dont contain element
+        int[][] reduced = new int[count][currentSets[0].length]; // sets without element
+        int setIndex = 0;
         for(int i = 0; i < currentSets.length; i++){
             boolean found = false;
             for(int j = 0; j < currentSets[i].length; j++){
@@ -218,10 +226,11 @@ public class HittingSetProblem {
                 }
             }
 
-            // If we didn't encounter element in the set Bi
             if(!found){
-                // Copy all elements of set Bi into reduced
-                System.arraycopy(currentSets[i], 0, reduced[setIndex], 0, currentSets[i].length);
+                // Copy all elements of set into reduced since it doesnt contain element
+                for (int j = 0; j < currentSets[i].length; j++) {
+                    reduced[setIndex][j] = currentSets[i][j];
+                }
                 setIndex++;
             }
         }
@@ -255,6 +264,7 @@ public class HittingSetProblem {
                 }
             }
 
+            // update minimum index & size
             if(count < minCount){
                 minCount = count;
                 minIndex = i;
@@ -287,7 +297,6 @@ public class HittingSetProblem {
                 int val = sets[i][j];
                 if (val == 0) continue;
 
-                // Check if value in Bi subset is in hitting set
                 for (int h = 0; h < hittingSet.length; h++) {
                     if (val == hittingSet[h]) {
                         covered = true;
@@ -295,11 +304,11 @@ public class HittingSetProblem {
                     }
                 }
 
-                // If at least one is found -> break and check next Bi subset
+                // If at least one hit -> break and check next subset
                 if (covered) break;
             }
-
-            // If we check all values inside Bi subset, and none are found in hitting set -> INVALID
+            
+            // Doesnt hit this set -> false hitting set
             if (!covered) return false;
         }
         return true;
@@ -320,7 +329,7 @@ public class HittingSetProblem {
                 for(int j = 0; j < line.length; j++){
                     sets[i][j] = Integer.parseInt(line[j]);
                 }
-                // if B set's length is < than c, it automatically gets filled with 0s
+                // if subset's length is < than c, it automatically gets filled with 0s
             }
 
             reader.close();
@@ -332,34 +341,29 @@ public class HittingSetProblem {
     private int[][] generateRandomData(int n, int m, int c, int k) {
         int[][] sets = new int[m][c];
  
-        // Generate random sets
         for (int i = 0; i < m; i++) {
-            // For each set, decide how many elements it will have (between 1 and c)
+            // Random size selection [1..c]
             int setSize = 1 + (int)(Math.random() * c);
 
-            // Use a boolean array to track which elements are already in the set
             boolean[] used = new boolean[n+1];
 
             // Fill the set with random elements
             for (int j = 0; j < setSize; j++) {
                 int element;
                 do {
-                    // Generate elements from 1 to n
+                    // Random element
                     element = 1 + (int)(Math.random() * n);
-                } while (used[element]); // no duplicates in same set
+                } while (used[element]); // avoid duplicates
 
                 sets[i][j] = element;
                 used[element] = true;
             }
-
-            // Sort the elements in the set for better readability
-            Arrays.sort(sets[i], 0, setSize);
         }
  
         return sets;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         try {
             boolean experimentMode = false;
 
